@@ -1,145 +1,49 @@
 import java.util.Scanner;
 
-public class IntroduccionJava {
-    // Variable global para descuento especial
+public class Main {
     public static final double descuentoEspecial = 0.10;
 
     public static void main(String[] args) {
-        final int n = 5;
-        final double nn = 5.5;
-        // holaJava();
-        // imprimirDatos();
-        // solicitarDatos();
-        // operacionesBasicas();
-        // mostrarDatos();
-        // divisionEnteros();
-        contadoresAnidados();
-    }
-    
-    // Ejercicio 2
-    public static void holaJava() {
-        System.out.println("¡Hola, Java!");
-    }
+        Scanner scanner = new Scanner(System.in);
+        esBisiesto();
+        mayorDeTresNumeros();
+        clasificacionEdad();
+        calculadoraDeDescuentos();
+        sumaDePares();
+        contadorDeNumeros();
+        validadorDeNotas();
+        precioFinal();
+        manipularPrecios();
+        manipularPreciosRecursivo();
 
-    // Ejercicio 3
-    public static void imprimirDatos() {
-        String nombre = "Juan";
-        int edad = 25;
-        double altura = 1.75;
-        boolean estudiante = true;
-        System.out.println("Nombre: " + nombre);
-        System.out.println("Edad: " + edad);
-        System.out.println("Altura: " + altura);
-        System.out.println("Estudiante: " + estudiante);
-    }
+        // Ejercicio 9 - Cálculo de Precio Final con Impuesto y Descuento (versión alternativa)
+        System.out.println("Ingrese el precio del producto: ");
+        double precioBase = scanner.nextDouble();
+        System.out.println("Ingrese el peso del paquete en kg: ");
+        double peso = scanner.nextDouble();
+        System.out.println("Ingrese la zona de envío (Nacional/Internacional): ");
+        String zona = scanner.next();
+        double costoEnvio = calcularCostoEnvio(peso, zona);
+        calcularTotalCompra(precioBase, costoEnvio);
 
-    // Ejercicio 4
-    public static void solicitarDatos() {
-        Scanner scanner = new java.util.Scanner(System.in);
-        System.out.print("Ingrese su nombre: ");
-        String nombre = scanner.nextLine();
-        System.out.print("Ingrese su edad: ");
-        int edad = scanner.nextInt();
-        System.out.println("Nombre: " + nombre + "Edad: " + edad);
+        // Ejercicio 10 - Actualización de Stock
+        System.out.println("Ingrese el stock actual del producto: ");
+        int stock = scanner.nextInt();
+        System.out.println("Ingrese la cantidad vendida: ");
+        int cantidadVendida = scanner.nextInt();
+        System.out.println("Ingrese la cantidad recibida: ");
+        int cantidadRecibida = scanner.nextInt();
+        
+        actualizarStock(stock, cantidadVendida, cantidadRecibida);
+
+        // Ejercicio 11 - Cálculo de Descuento Especial
+        System.out.println("Ingrese el precio del producto para calcular el descuento especial: ");
+        double precioProducto = scanner.nextDouble();
+        calcularDescuentoEspecial(precioProducto);
+
         scanner.close();
     }
-
-    // Ejercicio 5
-    public static void operacionesBasicas() {
-        Scanner scanner = new java.util.Scanner(System.in);
-        System.out.print("Ingrese el primer número: ");
-        int num1 = scanner.nextInt();
-        System.out.print("Ingrese el segundo número: ");
-        int num2 = scanner.nextInt();
-        System.out.println("Suma: " + (num1 + num2));
-        System.out.println("Resta: " + (num1 - num2));
-        System.out.println("Multiplicación: " + (num1 * num2));
-        if (num2 != 0) {
-            System.out.println("División: " + ((double) num1 / num2));
-        }
-        else {
-            System.out.println("División: No se puede dividir por cero.");
-        }
-        scanner.close();
-    }
-
-    // Ejercicio 6
-    public static void mostrarDatos() {
-        System.out.println("Nombre: Juan Pérez\nEdad: 30 años\nDirección: \"Calle Falsa 123\"");
-    }
-
-    // Ejercicio 7
-    public static void divisionEnteros() {
-        Scanner scanner = new java.util.Scanner(System.in);
-        System.out.print("Ingrese el primer número entero: ");
-        int num1 = scanner.nextInt();
-        System.out.print("Ingrese el segundo número entero: ");
-        int num2 = scanner.nextInt();
-        System.out.println("División entera: " + num1 / num2);
-
-        System.out.print("Ingrese otro número entero: ");
-        double num3 = scanner.nextInt();
-        System.out.print("Ingrese un número entero mas: ");
-        double num4 = scanner.nextInt();
-        System.out.println("División decimal: " + num3 / num4);
-        scanner.close();
-    }
-
-    public static void condicional() {
-        Scanner scan = new Scanner(System.in);
-
-        int contador = 0;
-
-        int totalNumeros = 5;
-
-        int i = 0;
-
-        int num;
-
-        while (i < totalNumeros) {
-
-            System.out.print("Ingrese un número: ");
-
-            num = scan.nextInt();
-
-            if (num > 0) {
-
-                contador++;
-
-            }
-
-            i++;
-
-        }
-
-        scan.close();
-
-        System.out.println("Cantiad de números positivos:  " + contador);
-    }
-
-     public static void sumatoria() {
-        int suma = 0;
-
-        for (int i = 9; i >= 1; i -= 2) {
-            System.out.println("Iteración: " + i);
-            suma += i;
-        }
-
-        System.out.println("Resultado: " + suma);
-
-    }
-
-    public static void edades() {
-        int[] edades = {10, 20, 30, 40};
-
-        for (int i = 0; i < edades.length; i++) {
-            System.out.println("Edad en la posición " + i + ": ");
-            System.out.println(edades[i]);
-        }
-    }
-
-    //////////////////////////////////
-    
+    // Ejercicio 1 - Verificación de Año Bisiesto.
     public static void esBisiesto() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese un año: ");
@@ -153,6 +57,7 @@ public class IntroduccionJava {
         }
     }
 
+    // Ejercicio 2 - Determinar el Mayor de Tres Números.
     public static void mayorDeTresNumeros() {
         Scanner scanner = new Scanner(System.in);
         int[] numeros = new int[3];
@@ -179,6 +84,7 @@ public class IntroduccionJava {
         scanner.close();
     }
 
+    // Ejercicio 3 - Clasificación de Edad
     public static void clasificacionEdad() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese su edad: ");
@@ -199,8 +105,9 @@ public class IntroduccionJava {
         }
     }
 
+    // Ejercicio 4 - Calculadora de Descuento según categoría.
     public static void calculadoraDeDescuentos() {
-        Scanner scanner = new Scanner(System.in);
+    Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese el precio del producto: ");
         double precio = scanner.nextDouble();
         System.out.println("Ingrese la categoría del producto (A, B o C): ");
@@ -230,6 +137,7 @@ public class IntroduccionJava {
         System.out.println("Precio final: " + (precio - (precio * descuento)));
     }
 
+    // Ejercicio 5 - Suma de Números Pares
     public static void sumaDePares() {
         Scanner scanner = new Scanner(System.in);
         boolean continuar = true;
@@ -251,6 +159,7 @@ public class IntroduccionJava {
         System.out.println("La suma de los números pares ingresados es: " + total);
     }
 
+    // Ejercicio 6 - Contador de Positivos, Negativos y Ceros
     public static void contadorDeNumeros() {
         Scanner scan = new Scanner(System.in);
         int positivos = 0;
@@ -275,6 +184,7 @@ public class IntroduccionJava {
         scan.close();
     }
 
+    // Ejercicio 7 - Validación de Nota entre 0 y 10
     public static void validadorDeNotas() {
         Scanner scanner = new Scanner(System.in);
         boolean continuar = true;
@@ -294,6 +204,7 @@ public class IntroduccionJava {
         scanner.close();
     }
 
+    // Ejercicio 8 - Cálculo de Precio Final con Impuesto y Descuento
     public static void precioFinal() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Ingrese el precio base del producto: ");
@@ -309,6 +220,7 @@ public class IntroduccionJava {
         scanner.close();
     }
 
+    // Ejercicio 9 - Cálculo de Precio Final con Impuesto y Descuento (versión alternativa)
     public static double calcularCostoEnvio(double peso, String zona) {
         double costoPorKg = zona.equalsIgnoreCase("Nacional") ? 5.0 : 10.0;
         double costoEnvio = peso * costoPorKg;
@@ -322,41 +234,40 @@ public class IntroduccionJava {
         System.out.println("El total a pagar es: " + totalCompra);
     }
 
+    // Ejercicio 10 - Actualización de Stock
     public static void actualizarStock(int stockActual, int cantidadVendida, int cantidadRecibida) {
         System.out.println("El nuevo stock del producto es: " + (stockActual - cantidadVendida + cantidadRecibida));
     }
 
-    /*
-     * Declara una variable global Ejemplo de entrada/salida: = 0.10. 
-     * Luego, crea un método calcularDescuentoEspecial(double precio) que use la variable global para calcular el descuento especial del 10%.
-Dentro del método, declara una variable local descuentoAplicado, almacena el valor del descuento y muestra el precio final con descuento
-     */
+    // Ejercicio 11 - Cálculo de Descuento Especial
     public static void calcularDescuentoEspecial(double precio) {
         double descuentoAplicado = precio * descuentoEspecial;
         double precioFinal = precio - descuentoAplicado;
         System.out.println("Precio final con descuento especial: " + precioFinal);
     }
 
-    // public static void manipularPrecios() {
-    //     double[] precios = {199.99, 299.50, 149.75, 399.00, 89.99};
-        
-    //     // Mostrar precios originales
-    //     System.out.println("Precios originales:");
-    //     for (double precio : precios) {
-    //         System.out.printf("Precio: $%.2f ", precio);
-    //     }
-    //     System.out.println();
-
-    //     precios[2] = 129.99;
-        
-    //     System.out.println("Precios modificados:");
-    //     for (double precio : precios) {
-    //         System.out.printf("Precio: $%.2f ", precio);
-    //     }
-    //     System.out.println();
-    // }
-
+    // Ejercicio 12 - Manipulación de Precios
     public static void manipularPrecios() {
+        double[] precios = {199.99, 299.50, 149.75, 399.00, 89.99};
+        
+        // Mostrar precios originales
+        System.out.println("Precios originales:");
+        for (double precio : precios) {
+            System.out.printf("Precio: $%.2f ", precio);
+        }
+        System.out.println();
+
+        precios[2] = 129.99;
+        
+        System.out.println("Precios modificados:");
+        for (double precio : precios) {
+            System.out.printf("Precio: $%.2f ", precio);
+        }
+        System.out.println();
+    }
+
+    // Ejercio 13 - Manipulacion de precios recursivo
+    public static void manipularPreciosRecursivo() {
     double[] precios = {199.99, 299.50, 149.75, 399.00, 89.99};
     
     // Mostrar precios originales
@@ -385,19 +296,5 @@ Dentro del método, declara una variable local descuentoAplicado, almacena el va
         
         // Llamada recursiva para el siguiente elemento
         mostrarPreciosRecursivo(precios, indice + 1);
-    }
-
-    public static void contadoresAnidados() {
-       int contador = 1;
-
-        while (contador <= 3) {
-            System.out.println("Conteo externo: " + contador);
-
-            for (int i = 1; i <= 4; i++) {
-                System.out.println("  Conteo interno: " + i);
-            }
-
-            contador++;
-        }
     }
 }
