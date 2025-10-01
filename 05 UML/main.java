@@ -3814,3 +3814,545 @@ public class TestGeneradorQR {
         System.out.println("✓ Bajo acoplamiento y alta cohesión");
     }
 }
+
+// Ejercicio 2 - EditorVideo - Proyecto - Render
+// Clase Proyecto
+public class Proyecto {
+    private String nombre;
+    private int duracionMin;
+    private String resolucion;
+    private int fotogramasPorSegundo;
+    
+    public Proyecto(String nombre, int duracionMin) {
+        this.nombre = nombre;
+        this.duracionMin = duracionMin;
+        this.resolucion = "1920x1080"; // Por defecto Full HD
+        this.fotogramasPorSegundo = 30;
+    }
+    
+    public Proyecto(String nombre, int duracionMin, String resolucion, int fps) {
+        this.nombre = nombre;
+        this.duracionMin = duracionMin;
+        this.resolucion = resolucion;
+        this.fotogramasPorSegundo = fps;
+    }
+    
+    public String getNombre() {
+        return nombre;
+    }
+    
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+    
+    public int getDuracionMin() {
+        return duracionMin;
+    }
+    
+    public void setDuracionMin(int duracionMin) {
+        this.duracionMin = duracionMin;
+    }
+    
+    public String getResolucion() {
+        return resolucion;
+    }
+    
+    public void setResolucion(String resolucion) {
+        this.resolucion = resolucion;
+    }
+    
+    public int getFotogramasPorSegundo() {
+        return fotogramasPorSegundo;
+    }
+    
+    public void setFotogramasPorSegundo(int fotogramasPorSegundo) {
+        this.fotogramasPorSegundo = fotogramasPorSegundo;
+    }
+    
+    public long calcularTamañoEstimadoMB() {
+        // Estimación simple: resolución * duración * fps * factor de compresión
+        long pixeles = calcularPixeles();
+        long frames = duracionMin * 60 * fotogramasPorSegundo;
+        return (pixeles * frames) / (1024 * 1024 * 8); // Estimación burda
+    }
+    
+    private long calcularPixeles() {
+        String[] parts = resolucion.split("x");
+        if (parts.length == 2) {
+            try {
+                return Long.parseLong(parts[0]) * Long.parseLong(parts[1]);
+            } catch (NumberFormatException e) {
+                return 1920 * 1080;
+            }
+        }
+        return 1920 * 1080;
+    }
+    
+    @Override
+    public String toString() {
+        return "Proyecto{nombre='" + nombre + "', duracion=" + duracionMin + 
+               " min, resolucion='" + resolucion + "', fps=" + fotogramasPorSegundo + "}";
+    }
+}
+
+// Clase Render
+import java.util.Date;
+import java.text.SimpleDateFormat;
+
+public class Render {
+    private String formato;
+    private Proyecto proyecto; // Asociación unidireccional
+    private Date fechaCreacion;
+    private String nombreArchivo;
+    private long tamañoMB;
+    private String calidad;
+    private String estado; // "Procesando", "Completado", "Error"
+    
+    public Render(String formato, Proyecto proyecto) {
+        this.formato = formato;
+        this.proyecto = proyecto;
+        this.fechaCreacion = new Date();
+        this.nombreArchivo = generarNombreArchivo();
+        this.calidad = "Media";
+        this.estado = "Procesando";
+        this.tamañoMB = proyecto.calcularTamañoEstimadoMB();
+    }
+    
+    public Render(String formato, Proyecto proyecto, String calidad) {
+        this.formato = formato;
+        this.proyecto = proyecto;
+        this.fechaCreacion = new Date();
+        this.calidad = calidad;
+        this.nombreArchivo = generarNombreArchivo();
+        this.estado = "Procesando";
+        this.tamañoMB = calcularTamañoPorCalidad(proyecto, calidad);
+    }
+    
+    private String generarNombreArchivo() {
+        String nombreLimpio = proyecto.getNombre().replaceAll("[^a-zA-Z0-9]", "_");
+        return nombreLimpio + "_" + System.currentTimeMillis() + "." + formato.toLowerCase();
+    }
+    
+    private long calcularTamañoPorCalidad(Proyecto proyecto, String calidad) {
+        long tamañoBase = proyecto.calcularTamañoEstimadoMB();
+        switch (calidad.toLowerCase()) {
+            case "baja": return tamañoBase / 4;
+            case "media": return tamañoBase / 2;
+            case "alta": return tamañoBase;
+            case "ultra": return tamañoBase * 2;
+            default: return tamañoBase / 2;
+        }
+    }
+    
+    public String getFormato() {
+        return formato;
+    }
+    
+    public void setFormato(String formato) {
+        this.formato = formato;
+    }
+    
+    public Proyecto getProyecto() {
+        return proyecto;
+    }
+    
+    public void setProyecto(Proyecto proyecto) {
+        this.proyecto = proyecto;
+    }
+    
+    public Date getFechaCreacion() {
+        return fechaCreacion;
+    }
+    
+    public String getNombreArchivo() {
+        return nombreArchivo;
+    }
+    
+    public long getTamañoMB() {
+        return tamañoMB;
+    }
+    
+    public String getCalidad() {
+        return calidad;
+    }
+    
+    public String getEstado() {
+        return estado;
+    }
+    
+    public void completar() {
+        this.estado = "Completado";
+    }
+    
+    public void marcarError() {
+        this.estado = "Error";
+    }
+    
+    public void mostrarDetalles() {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        System.out.println("\n╔════════════════════════════════════════════════════╗");
+        System.out.println("║              RENDER DE VIDEO                       ║");
+        System.out.println("╠════════════════════════════════════════════════════╣");
+        System.out.println("║ Proyecto: " + String.format("%-40s", proyecto.getNombre()) + " ║");
+        System.out.println("║ Formato: " + String.format("%-41s", formato) + " ║");
+        System.out.println("║ Calidad: " + String.format("%-41s", calidad) + " ║");
+        System.out.println("║ Archivo: " + String.format("%-41s", nombreArchivo) + " ║");
+        System.out.println("║ Tamaño: " + String.format("%-36s", tamañoMB + " MB") + " ║");
+        System.out.println("║ Estado: " + String.format("%-42s", estado) + " ║");
+        System.out.println("║ Creado: " + String.format("%-42s", sdf.format(fechaCreacion)) + " ║");
+        System.out.println("╚════════════════════════════════════════════════════╝");
+    }
+    
+    @Override
+    public String toString() {
+        return "Render{archivo='" + nombreArchivo + "', formato='" + formato + 
+               "', estado=" + estado + ", tamaño=" + tamañoMB + "MB}";
+    }
+}
+
+// Clase EditorVideo (con DEPENDENCIA DE CREACIÓN)
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Arrays;
+
+public class EditorVideo {
+    // IMPORTANTE: NO tiene atributo de tipo Render o List<Render>
+    // Crea objetos Render dentro de métodos pero NO los guarda
+    
+    private String version;
+    private int rendersGenerados;
+    private List<String> formatosSoportados;
+    
+    public EditorVideo(String version) {
+        this.version = version;
+        this.rendersGenerados = 0;
+        this.formatosSoportados = Arrays.asList("MP4", "AVI", "MOV", "MKV", "WEBM", "FLV");
+    }
+    
+    // DEPENDENCIA DE CREACIÓN: crea un Render dentro del método
+    // pero NO lo guarda como atributo, solo lo retorna
+    public Render exportar(String formato, Proyecto proyecto) {
+        if (!validarFormato(formato)) {
+            System.out.println("✗ Error: Formato '" + formato + "' no soportado");
+            System.out.println("  Formatos disponibles: " + formatosSoportados);
+            return null;
+        }
+        
+        if (proyecto == null) {
+            System.out.println("✗ Error: Proyecto no válido");
+            return null;
+        }
+        
+        System.out.println("\n▶ Iniciando exportación...");
+        System.out.println("  Proyecto: " + proyecto.getNombre());
+        System.out.println("  Formato: " + formato);
+        
+        // Simular proceso de renderizado
+        simularProceso(proyecto.getDuracionMin());
+        
+        // CREA el objeto Render
+        Render render = new Render(formato, proyecto);
+        
+        // Procesar el render
+        render.completar();
+        rendersGenerados++;
+        
+        System.out.println("✓ Exportación completada");
+        System.out.println("  Archivo: " + render.getNombreArchivo());
+        System.out.println("  Tamaño: " + render.getTamañoMB() + " MB");
+        
+        // RETORNA el objeto sin guardarlo
+        return render;
+    }
+    
+    // DEPENDENCIA DE CREACIÓN: crea Render con calidad específica
+    public Render exportarConCalidad(String formato, Proyecto proyecto, String calidad) {
+        if (!validarFormato(formato) || proyecto == null) {
+            System.out.println("✗ Error: Parámetros inválidos");
+            return null;
+        }
+        
+        System.out.println("\n▶ Iniciando exportación en calidad " + calidad + "...");
+        System.out.println("  Proyecto: " + proyecto.getNombre());
+        System.out.println("  Formato: " + formato);
+        
+        simularProceso(proyecto.getDuracionMin());
+        
+        // CREA el objeto Render con calidad
+        Render render = new Render(formato, proyecto, calidad);
+        
+        render.completar();
+        rendersGenerados++;
+        
+        System.out.println("✓ Exportación completada");
+        
+        // RETORNA sin guardar
+        return render;
+    }
+    
+    // DEPENDENCIA DE CREACIÓN: crea múltiples Renders
+    public List<Render> exportarMultiple(List<String> formatos, Proyecto proyecto) {
+        if (formatos == null || formatos.isEmpty() || proyecto == null) {
+            System.out.println("✗ Error: Parámetros inválidos");
+            return new ArrayList<>();
+        }
+        
+        List<Render> rendersCreados = new ArrayList<>();
+        
+        System.out.println("\n▶ Iniciando exportación múltiple...");
+        System.out.println("  Proyecto: " + proyecto.getNombre());
+        System.out.println("  Formatos: " + formatos);
+        
+        for (String formato : formatos) {
+            if (validarFormato(formato)) {
+                System.out.println("\n  Procesando formato: " + formato);
+                simularProceso(1);
+                
+                // CREA cada Render
+                Render render = new Render(formato, proyecto);
+                render.completar();
+                rendersCreados.add(render);
+                rendersGenerados++;
+                
+                System.out.println("  ✓ " + formato + " completado");
+            } else {
+                System.out.println("  ✗ " + formato + " no soportado");
+            }
+        }
+        
+        System.out.println("\n✓ Exportación múltiple completada");
+        System.out.println("  Archivos generados: " + rendersCreados.size());
+        
+        // RETORNA la lista sin guardar los objetos
+        return rendersCreados;
+    }
+    
+    // DEPENDENCIA DE CREACIÓN: exportar para redes sociales
+    public Render exportarParaRedesSociales(Proyecto proyecto, String redSocial) {
+        if (proyecto == null || redSocial == null) {
+            return null;
+        }
+        
+        String formato;
+        String calidad;
+        
+        // Configuración según red social
+        switch (redSocial.toLowerCase()) {
+            case "youtube":
+                formato = "MP4";
+                calidad = "Alta";
+                break;
+            case "instagram":
+                formato = "MP4";
+                calidad = "Media";
+                break;
+            case "tiktok":
+                formato = "MP4";
+                calidad = "Media";
+                break;
+            case "facebook":
+                formato = "MP4";
+                calidad = "Media";
+                break;
+            default:
+                formato = "MP4";
+                calidad = "Baja";
+        }
+        
+        System.out.println("\n▶ Exportando para " + redSocial + "...");
+        System.out.println("  Configuración optimizada: " + formato + " - " + calidad);
+        
+        simularProceso(proyecto.getDuracionMin());
+        
+        // CREA el Render optimizado
+        Render render = new Render(formato, proyecto, calidad);
+        render.completar();
+        rendersGenerados++;
+        
+        System.out.println("✓ Listo para " + redSocial);
+        
+        // RETORNA sin guardar
+        return render;
+    }
+    
+    private boolean validarFormato(String formato) {
+        return formatosSoportados.contains(formato.toUpperCase());
+    }
+    
+    private void simularProceso(int duracionMin) {
+        System.out.print("  Renderizando");
+        for (int i = 0; i < 3; i++) {
+            try {
+                Thread.sleep(300);
+                System.out.print(".");
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+        }
+        System.out.println(" ");
+    }
+    
+    public void mostrarEstadisticas() {
+        System.out.println("\n=== Estadísticas del Editor ===");
+        System.out.println("Versión: " + version);
+        System.out.println("Total de renders generados: " + rendersGenerados);
+        System.out.println("Formatos soportados: " + formatosSoportados);
+    }
+    
+    public String getVersion() {
+        return version;
+    }
+    
+    public int getRendersGenerados() {
+        return rendersGenerados;
+    }
+    
+    @Override
+    public String toString() {
+        return "EditorVideo{version='" + version + "', renders generados=" + rendersGenerados + "}";
+    }
+}
+
+// Clase de prueba
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+public class TestEditorVideo {
+    public static void main(String[] args) {
+        System.out.println("╔════════════════════════════════════════════════════╗");
+        System.out.println("║        SISTEMA EDITOR DE VIDEO                     ║");
+        System.out.println("╚════════════════════════════════════════════════════╝\n");
+        
+        // Crear proyectos independientes
+        System.out.println("--- Creando Proyectos ---");
+        Proyecto proyecto1 = new Proyecto("Video Promocional", 3);
+        Proyecto proyecto2 = new Proyecto("Tutorial Java", 15, "1280x720", 24);
+        Proyecto proyecto3 = new Proyecto("Documental 4K", 45, "3840x2160", 60);
+        
+        System.out.println(proyecto1);
+        System.out.println(proyecto2);
+        System.out.println(proyecto3);
+        
+        // Crear editor
+        System.out.println("\n--- Creando Editor de Video ---");
+        EditorVideo editor = new EditorVideo("v2024.1");
+        System.out.println(editor);
+        
+        // DEMOSTRAR DEPENDENCIA DE CREACIÓN
+        System.out.println("\n╔════════════════════════════════════════════════════╗");
+        System.out.println("║   DEMOSTRANDO DEPENDENCIA DE CREACIÓN              ║");
+        System.out.println("╚════════════════════════════════════════════════════╝");
+        System.out.println("El EditorVideo CREA objetos Render dentro de métodos");
+        System.out.println("pero NO los guarda como atributo\n");
+        
+        // Exportar proyectos (el editor crea pero no guarda)
+        System.out.println("--- Exportando Proyectos ---");
+        Render render1 = editor.exportar("MP4", proyecto1);
+        Render render2 = editor.exportar("AVI", proyecto2);
+        Render render3 = editor.exportarConCalidad("MP4", proyecto3, "Ultra");
+        
+        // Los renders existen independientemente del editor
+        System.out.println("\n--- Renders Creados ---");
+        if (render1 != null) render1.mostrarDetalles();
+        if (render2 != null) render2.mostrarDetalles();
+        if (render3 != null) render3.mostrarDetalles();
+        
+        // Exportar para redes sociales
+        System.out.println("\n--- Exportación para Redes Sociales ---");
+        Render renderYT = editor.exportarParaRedesSociales(proyecto1, "youtube");
+        Render renderIG = editor.exportarParaRedesSociales(proyecto2, "instagram");
+        Render renderTT = editor.exportarParaRedesSociales(proyecto1, "tiktok");
+        
+        renderYT.mostrarDetalles();
+        renderIG.mostrarDetalles();
+        
+        // Exportar en múltiples formatos
+        System.out.println("\n--- Exportación Múltiple ---");
+        List<String> formatos = Arrays.asList("MP4", "AVI", "MKV", "WEBM");
+        List<Render> rendersMultiples = editor.exportarMultiple(formatos, proyecto2);
+        
+        System.out.println("\nRenders generados:");
+        for (Render r : rendersMultiples) {
+            System.out.println("  • " + r);
+        }
+        
+        // DEMOSTRAR que el editor NO guarda los renders
+        System.out.println("\n╔════════════════════════════════════════════════════╗");
+        System.out.println("║   CARACTERÍSTICA CLAVE DE DEPENDENCIA DE CREACIÓN ║");
+        System.out.println("╚════════════════════════════════════════════════════╝");
+        System.out.println("El editor CREA renders pero NO los guarda:");
+        System.out.println("✓ Los objetos Render se crean dentro de los métodos");
+        System.out.println("✓ Se retornan al código que llamó al método");
+        System.out.println("✓ El editor NO mantiene referencias a ellos");
+        System.out.println("✓ Solo cuenta cuántos ha generado (estadística)");
+        
+        editor.mostrarEstadisticas();
+        
+        // El cliente decide qué hacer con los renders
+        System.out.println("\n--- El Cliente Almacena los Renders ---");
+        List<Render> misRenders = new ArrayList<>();
+        
+        System.out.println("Generando y almacenando renders (el CLIENTE los guarda):");
+        misRenders.add(editor.exportar("MP4", proyecto1));
+        misRenders.add(editor.exportar("MOV", proyecto1));
+        misRenders.add(editor.exportarConCalidad("MP4", proyecto2, "Alta"));
+        
+        System.out.println("\nMis renders almacenados por el cliente:");
+        for (Render r : misRenders) {
+            System.out.println("  • " + r);
+        }
+        
+        // Comparar con otras relaciones
+        System.out.println("\n╔════════════════════════════════════════════════════╗");
+        System.out.println("║   COMPARACIÓN CON OTRAS RELACIONES                 ║");
+        System.out.println("╚════════════════════════════════════════════════════╝");
+        
+        System.out.println("\nSi fuera COMPOSICIÓN:");
+        System.out.println("  - El editor tendría: private List<Render> rendersCreados;");
+        System.out.println("  - Controlaría el ciclo de vida de los renders");
+        System.out.println("  - Si se destruye el editor, se destruyen los renders");
+        
+        System.out.println("\nSi fuera AGREGACIÓN:");
+        System.out.println("  - El editor tendría: private List<Render> rendersGestionados;");
+        System.out.println("  - Guardaría referencias pero no controlaría el ciclo de vida");
+        
+        System.out.println("\nSi fuera DEPENDENCIA DE USO:");
+        System.out.println("  - El editor recibiría Render como parámetro");
+        System.out.println("  - Métodos como: validar(Render), comprimir(Render)");
+        System.out.println("  - No crearía ni guardaría renders");
+        
+        System.out.println("\nComo es DEPENDENCIA DE CREACIÓN:");
+        System.out.println("  - El editor CREA objetos Render");
+        System.out.println("  - NO los guarda como atributos");
+        System.out.println("  - Los retorna inmediatamente");
+        System.out.println("  - Es una FÁBRICA (Factory Pattern)");
+        System.out.println("  - Responsabilidad: crear y configurar renders");
+        
+        // Probar validaciones
+        System.out.println("\n--- Validaciones y Manejo de Errores ---");
+        editor.exportar("INVALID", proyecto1);
+        editor.exportar("MP4", null);
+        
+        // Resumen final
+        System.out.println("\n╔════════════════════════════════════════════════════╗");
+        System.out.println("║              RESUMEN FINAL                         ║");
+        System.out.println("╚════════════════════════════════════════════════════╝");
+        System.out.println("Proyectos creados: 3");
+        editor.mostrarEstadisticas();
+        System.out.println(editor);
+        
+        System.out.println("\n📋 Relaciones:");
+        System.out.println("• Render → Proyecto: Asociación unidireccional");
+        System.out.println("  (el render guarda al proyecto del que fue generado)");
+        System.out.println("• EditorVideo → Render: Dependencia de creación");
+        System.out.println("  (el editor crea renders pero no los guarda)");
+        
+        System.out.println("\n🏭 Patrón de Diseño:");
+        System.out.println("✓ El EditorVideo implementa el patrón FACTORY");
+        System.out.println("✓ Centraliza la lógica de creación de renders");
+        System.out.println("✓ Configura automáticamente según el contexto");
+        System.out.println("✓ No mantiene estado de los objetos creados");
+        System.out.println("✓ Responsabilidad única y bajo acoplamiento");
+    }
+}
