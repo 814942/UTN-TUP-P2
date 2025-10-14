@@ -1,4 +1,4 @@
-package Practica.src;
+package Practica.src.Ejercicio_primero;
 
 import java.util.ArrayList;
 import java.util.List;

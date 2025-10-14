@@ -1,4 +1,4 @@
-package Practica.src;
+package Practica.src.Ejercicio_primero;
 
 public class Main {
     public static void main(String[] args) {

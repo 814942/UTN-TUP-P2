@@ -1,4 +1,4 @@
-package Practica.src;
+package Practica.src.Ejercicio_primero;
 
 public enum CategoriaProducto {
     ALIMENTOS("Productos comestibles"),
